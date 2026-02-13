@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeshCore + BitChat Bridge Setup Guide</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">&#x1F4E1;</span>
+                <h1>MeshCore + BitChat</h1>
+            </div>
+            <p class="tagline">Bridge Bluetooth Mesh and LoRa Networks</p>
+        </div>
+    </header>
+
+    <nav id="nav">
+        <div class="container">
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#hardware">Hardware</a></li>
+                <li><a href="#downloads">Downloads</a></li>
+                <li><a href="#flash-heltec">Flash Heltec V3</a></li>
+                <li><a href="#flash-sensecap">Flash SenseCAP</a></li>
+                <li><a href="#configure">Configure</a></li>
+                <li><a href="#app-setup">App Setup</a></li>
+                <li><a href="#test">Test</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Overview Section -->
+        <section id="overview" class="section">
+            <div class="container">
+                <h2>What You're Building</h2>
+                <div class="overview-diagram">
+                    <div class="diagram-box phone">
+                        <div class="icon">&#x1F4F1;</div>
+                        <div class="label">BitChat App</div>
+                        <div class="sublabel">Android Phone</div>
+                    </div>
+                    <div class="diagram-arrow">
+                        <span>Bluetooth</span>
+                    </div>
+                    <div class="diagram-box bridge">
+                        <div class="icon">&#x1F4E1;</div>
+                        <div class="label">Heltec V3</div>
+                        <div class="sublabel">BitChat Bridge</div>
+                    </div>
+                    <div class="diagram-arrow">
+                        <span>LoRa</span>
+                    </div>
+                    <div class="diagram-box repeater">
+                        <div class="icon">&#x2600;</div>
+                        <div class="label">SenseCAP Solar</div>
+                        <div class="sublabel">LoRa Repeater</div>
+                    </div>
+                </div>
+                
+                <div class="info-cards">
+                    <div class="card">
+                        <h3>BitChat</h3>
+                        <p>Bluetooth mesh chat app with IRC-style interface. Works offline, peer-to-peer, with end-to-end encryption.</p>
+                    </div>
+                    <div class="card">
+                        <h3>MeshCore</h3>
+                        <p>Lightweight LoRa mesh protocol for long-range communication. Multi-hop routing extends range for miles.</p>
+                    </div>
+                    <div class="card">
+                        <h3>The Bridge</h3>
+                        <p>Messages on the <code>#mesh</code> channel are relayed between BitChat (Bluetooth) and MeshCore (LoRa) networks.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hardware Section -->
+        <section id="hardware" class="section alt-bg">
+            <div class="container">
+                <h2>Required Hardware</h2>
+                
+                <div class="hardware-grid">
+                    <div class="hardware-item">
+                        <div class="hardware-icon">&#x1F4FB;</div>
+                        <h3>Heltec LoRa32 V3</h3>
+                        <p class="hardware-role">Bridge Device</p>
+                        <ul>
+                            <li>ESP32-S3 MCU</li>
+                            <li>SX1262 LoRa Radio</li>
+                            <li>Built-in OLED display</li>
+                            <li>USB-C for flashing</li>
+                        </ul>
+                        <a href="https://heltec.org/project/wifi-lora-32-v3/" target="_blank" class="btn btn-small">Buy Heltec V3</a>
+                    </div>
+                    
+                    <div class="hardware-item">
+                        <div class="hardware-icon">&#x2600;</div>
+                        <h3>SenseCAP Solar Node P1</h3>
+                        <p class="hardware-role">LoRa Repeater</p>
+                        <ul>
+                            <li>nRF52840 MCU</li>
+                            <li>SX1262 LoRa Radio</li>
+                            <li>5W Solar Panel</li>
+                            <li>Battery powered (18650)</li>
+                        </ul>
+                        <a href="https://www.seeedstudio.com/SenseCAP-Card-Tracker-T1000-A-p-5697.html" target="_blank" class="btn btn-small">Buy SenseCAP</a>
+                    </div>
+                    
+                    <div class="hardware-item">
+                        <div class="hardware-icon">&#x1F4F1;</div>
+                        <h3>Android Phone</h3>
+                        <p class="hardware-role">BitChat Client</p>
+                        <ul>
+                            <li>Android 8.0+</li>
+                            <li>Bluetooth LE support</li>
+                            <li>USB debugging (for ADB install)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>Note:</strong> You'll also need a USB-C cable for flashing and a computer running Windows, macOS, or Linux.
+                </div>
+            </div>
+        </section>
+
+        <!-- Downloads Section -->
+        <section id="downloads" class="section">
+            <div class="container">
+                <h2>Download Firmware & App</h2>
+                
+                <div class="downloads-grid">
+                    <div class="download-card">
+                        <div class="download-icon">&#x1F4E1;</div>
+                        <h3>Heltec V3 BitChat Bridge</h3>
+                        <p>Firmware that bridges BitChat (Bluetooth) to MeshCore (LoRa)</p>
+                        <div class="download-meta">
+                            <span class="chip">ESP32-S3</span>
+                            <span class="chip">v0.2-bitchat</span>
+                        </div>
+                        <a href="releases/heltec_v3_bitchat_bridge.zip" class="btn btn-primary">Download Firmware</a>
+                    </div>
+                    
+                    <div class="download-card">
+                        <div class="download-icon">&#x2600;</div>
+                        <h3>SenseCAP Solar Repeater</h3>
+                        <p>Standard MeshCore repeater firmware for LoRa mesh</p>
+                        <div class="download-meta">
+                            <span class="chip">nRF52840</span>
+                            <span class="chip">Latest</span>
+                        </div>
+                        <a href="releases/sensecap_solar_repeater.zip" class="btn btn-primary">Download Firmware</a>
+                    </div>
+                    
+                    <div class="download-card">
+                        <div class="download-icon">&#x1F4F1;</div>
+                        <h3>BitChat Android APK</h3>
+                        <p>Bluetooth mesh chat app for Android</p>
+                        <div class="download-meta">
+                            <span class="chip">Android 8.0+</span>
+                            <span class="chip">Debug Build</span>
+                        </div>
+                        <a href="releases/bitchat-android.apk" class="btn btn-primary">Download APK</a>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <strong>Alternative:</strong> You can also flash devices using the official web flashers:
+                    <ul>
+                        <li><a href="https://flasher.meshcore.co.uk" target="_blank">MeshCore Web Flasher</a> (Standard firmware)</li>
+                        <li><a href="https://github.com/jooray/MeshCore-BitChat/releases" target="_blank">BitChat Bridge Releases</a> (Bridge firmware)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Flash Heltec Section -->
+        <section id="flash-heltec" class="section alt-bg">
+            <div class="container">
+                <h2>Step 1: Flash Heltec V3 (Bridge)</h2>
+                
+                <div class="step-intro">
+                    <p>The Heltec V3 will serve as the bridge between BitChat (Bluetooth) and MeshCore (LoRa). This device needs special "BitChat Bridge" firmware.</p>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1.1</div>
+                        <div class="step-content">
+                            <h3>Connect Heltec V3 to Computer</h3>
+                            <p>Use a USB-C cable to connect your Heltec V3 to your computer. The device should power on and show the Heltec logo on the OLED display.</p>
+                            <div class="step-image">
+                                <div class="placeholder-image">Connect USB-C Cable</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">1.2</div>
+                        <div class="step-content">
+                            <h3>Open Web Flasher</h3>
+                            <p>Open Chrome or Edge browser (WebSerial required) and navigate to:</p>
+                            <div class="code-block">
+                                <a href="https://adafruit.github.io/Adafruit_WebSerial_ESPTool/" target="_blank">https://adafruit.github.io/Adafruit_WebSerial_ESPTool/</a>
+                            </div>
+                            <p>Or use the ESP Web Flasher:</p>
+                            <div class="code-block">
+                                <a href="https://esp.huhn.me/" target="_blank">https://esp.huhn.me/</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">1.3</div>
+                        <div class="step-content">
+                            <h3>Put Device in Flash Mode</h3>
+                            <p>To enter bootloader/flash mode on the Heltec V3:</p>
+                            <ol>
+                                <li>Hold down the <strong>BOOT</strong> button</li>
+                                <li>While holding BOOT, press and release <strong>RST</strong></li>
+                                <li>Release the <strong>BOOT</strong> button</li>
+                            </ol>
+                            <p>The OLED display should go blank, indicating bootloader mode.</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">1.4</div>
+                        <div class="step-content">
+                            <h3>Flash the Firmware</h3>
+                            <p>In the web flasher:</p>
+                            <ol>
+                                <li>Click <strong>Connect</strong> and select the serial port (usually "USB JTAG/Serial")</li>
+                                <li>Select <strong>Erase</strong> to clear existing firmware (recommended)</li>
+                                <li>Upload the downloaded <code>firmware-merged.bin</code> at address <code>0x0</code></li>
+                                <li>Click <strong>Program</strong></li>
+                            </ol>
+                            <div class="alert alert-info">
+                                <strong>Tip:</strong> If you downloaded a .zip, extract it first. Use the merged binary file for easiest flashing.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">1.5</div>
+                        <div class="step-content">
+                            <h3>Verify Flash Success</h3>
+                            <p>After flashing completes:</p>
+                            <ol>
+                                <li>Press the <strong>RST</strong> button to reboot</li>
+                                <li>The OLED should display "MeshCore" and device info</li>
+                                <li>The device is now ready for configuration</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cli-alternative">
+                    <h3>Command Line Alternative</h3>
+                    <p>If you prefer the command line, use esptool:</p>
+                    <div class="code-block">
+<pre><code># Install esptool
+pip install esptool
+
+# Flash (replace /dev/ttyUSB0 with your port)
+esptool.py --chip esp32-s3 -p /dev/ttyUSB0 \
+  write_flash 0x0 firmware-merged.bin</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Flash SenseCAP Section -->
+        <section id="flash-sensecap" class="section">
+            <div class="container">
+                <h2>Step 2: Flash SenseCAP Solar P1 (Repeater)</h2>
+                
+                <div class="step-intro">
+                    <p>The SenseCAP Solar P1 uses an nRF52840 chip and is flashed differently. It will serve as your LoRa mesh repeater.</p>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">2.1</div>
+                        <div class="step-content">
+                            <h3>Enter DFU Mode</h3>
+                            <p>To put the SenseCAP Solar into DFU (Device Firmware Upgrade) mode:</p>
+                            <ol>
+                                <li>Connect the device via USB-C</li>
+                                <li><strong>Double-press the RST (Reset) button quickly</strong></li>
+                                <li>A new USB drive named <strong>XIAO-SENSE</strong> should appear on your computer</li>
+                            </ol>
+                            <div class="alert alert-warning">
+                                <strong>Important:</strong> The double-press must be quick (within ~500ms). If the drive doesn't appear, try again.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2.2</div>
+                        <div class="step-content">
+                            <h3>Flash the Firmware</h3>
+                            <p>Flashing nRF52 devices is as simple as drag-and-drop:</p>
+                            <ol>
+                                <li>Extract the downloaded <code>sensecap_solar_repeater.zip</code></li>
+                                <li>Find the <code>.uf2</code> file inside</li>
+                                <li>Drag and drop the <code>.uf2</code> file onto the <strong>XIAO-SENSE</strong> drive</li>
+                                <li>The device will automatically flash and reboot</li>
+                            </ol>
+                            <div class="step-image">
+                                <div class="placeholder-image">Drag UF2 to XIAO-SENSE drive</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2.3</div>
+                        <div class="step-content">
+                            <h3>Verify Flash Success</h3>
+                            <p>After the device reboots:</p>
+                            <ul>
+                                <li>The XIAO-SENSE drive will disappear</li>
+                                <li>The device LED may blink to indicate activity</li>
+                                <li>The repeater is now operational</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cli-alternative">
+                    <h3>Command Line Alternative</h3>
+                    <p>Using adafruit-nrfutil:</p>
+                    <div class="code-block">
+<pre><code># Install nrfutil
+pip install adafruit-nrfutil
+
+# Flash (replace /dev/ttyACM0 with your port)
+adafruit-nrfutil --verbose dfu serial \
+  --package firmware.zip \
+  -p /dev/ttyACM0 -b 115200 \
+  --singlebank --touch 1200</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Configure Section -->
+        <section id="configure" class="section alt-bg">
+            <div class="container">
+                <h2>Step 3: Configure Devices</h2>
+                
+                <div class="step-intro">
+                    <p>Both devices need basic configuration. The most important setting is the LoRa frequency for your region.</p>
+                </div>
+
+                <div class="config-tabs">
+                    <button class="tab-btn active" data-tab="heltec-config">Heltec V3 (Bridge)</button>
+                    <button class="tab-btn" data-tab="sensecap-config">SenseCAP Solar</button>
+                </div>
+
+                <div class="tab-content active" id="heltec-config">
+                    <h3>Configure Heltec V3 Bridge</h3>
+                    <p>Connect via USB serial console or use the MeshCore web config tool:</p>
+                    
+                    <div class="code-block">
+                        <a href="https://config.meshcore.dev" target="_blank">https://config.meshcore.dev</a>
+                    </div>
+
+                    <h4>Essential Commands</h4>
+                    <div class="code-block">
+<pre><code># Set your region's frequency
+set freq 869.525      # EU: 869.525 MHz
+# set freq 906.875    # US: 906.875 MHz
+# set freq 916.875    # AU/NZ: 916.875 MHz
+
+# Set device name
+set name "MyBridge"
+
+# Set location (optional, for maps)
+set lat 51.5074
+set long -0.1278
+
+# Change admin password (default: "password")
+password mynewpassword
+
+# Save and reboot
+reboot</code></pre>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>BitChat Note:</strong> The bridge firmware automatically handles BitChat BLE connections. No additional BitChat-specific configuration is needed.
+                    </div>
+                </div>
+
+                <div class="tab-content" id="sensecap-config">
+                    <h3>Configure SenseCAP Solar Repeater</h3>
+                    <p>Connect via USB serial or use the web config tool:</p>
+                    
+                    <div class="code-block">
+                        <a href="https://config.meshcore.dev" target="_blank">https://config.meshcore.dev</a>
+                    </div>
+
+                    <h4>Essential Commands</h4>
+                    <div class="code-block">
+<pre><code># Set your region's frequency (MUST match bridge!)
+set freq 869.525      # EU: 869.525 MHz
+
+# Set repeater name
+set name "SolarRepeater1"
+
+# Set location (important for repeaters)
+set lat 51.5074
+set long -0.1278
+
+# Change admin password
+password mynewpassword
+
+# Save and reboot
+reboot</code></pre>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>Critical:</strong> The frequency MUST match between all devices on your mesh network!
+                    </div>
+                </div>
+
+                <div class="frequency-reference">
+                    <h3>Regional Frequency Reference</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Region</th>
+                                <th>Frequency</th>
+                                <th>Band</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Europe (EU)</td><td>869.525 MHz</td><td>868 MHz</td></tr>
+                            <tr><td>United States (US)</td><td>906.875 MHz</td><td>915 MHz</td></tr>
+                            <tr><td>Australia/NZ (ANZ)</td><td>916.875 MHz</td><td>915 MHz</td></tr>
+                            <tr><td>Japan (JP)</td><td>920.625 MHz</td><td>920 MHz</td></tr>
+                            <tr><td>Korea (KR)</td><td>921.125 MHz</td><td>920 MHz</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- App Setup Section -->
+        <section id="app-setup" class="section">
+            <div class="container">
+                <h2>Step 4: Install BitChat App</h2>
+                
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">4.1</div>
+                        <div class="step-content">
+                            <h3>Install the APK</h3>
+                            <p>You can install BitChat from:</p>
+                            <ul>
+                                <li><strong>Google Play:</strong> <a href="https://play.google.com/store/apps/details?id=com.bitchat.droid" target="_blank">BitChat on Play Store</a></li>
+                                <li><strong>Direct APK:</strong> Download from the <a href="#downloads">Downloads section</a></li>
+                            </ul>
+                            
+                            <p>For direct APK installation:</p>
+                            <ol>
+                                <li>Enable "Install from unknown sources" in Android settings</li>
+                                <li>Download and open the APK file</li>
+                                <li>Tap "Install"</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4.2</div>
+                        <div class="step-content">
+                            <h3>Grant Permissions</h3>
+                            <p>When first launching BitChat, grant these permissions:</p>
+                            <ul>
+                                <li><strong>Bluetooth</strong> - Required for mesh networking</li>
+                                <li><strong>Location</strong> - Required for Bluetooth scanning on Android</li>
+                                <li><strong>Notifications</strong> - For message alerts</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4.3</div>
+                        <div class="step-content">
+                            <h3>Connect to Bridge</h3>
+                            <p>BitChat will automatically discover nearby devices:</p>
+                            <ol>
+                                <li>Make sure your Heltec V3 bridge is powered on</li>
+                                <li>Open BitChat app</li>
+                                <li>The bridge should appear as a nearby peer</li>
+                                <li>BitChat connects automatically via BLE</li>
+                            </ol>
+                            <div class="alert alert-info">
+                                <strong>Note:</strong> BitChat does NOT require Bluetooth pairing. If your phone has previously paired with a MeshCore device, unpair it in Bluetooth settings.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4.4</div>
+                        <div class="step-content">
+                            <h3>Join #mesh Channel</h3>
+                            <p>To communicate with MeshCore users, join the bridged channel:</p>
+                            <div class="code-block">
+<pre><code>/j #mesh</code></pre>
+                            </div>
+                            <p>Messages sent to <code>#mesh</code> will be relayed to the MeshCore network!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Test Section -->
+        <section id="test" class="section alt-bg">
+            <div class="container">
+                <h2>Step 5: Test Your Setup</h2>
+                
+                <div class="test-checklist">
+                    <h3>Verification Checklist</h3>
+                    
+                    <div class="checklist">
+                        <label class="check-item">
+                            <input type="checkbox">
+                            <span>Heltec V3 OLED shows "MeshCore" and device info</span>
+                        </label>
+                        <label class="check-item">
+                            <input type="checkbox">
+                            <span>SenseCAP Solar LED blinks occasionally (receiving packets)</span>
+                        </label>
+                        <label class="check-item">
+                            <input type="checkbox">
+                            <span>BitChat app shows bridge device as connected</span>
+                        </label>
+                        <label class="check-item">
+                            <input type="checkbox">
+                            <span>Can join #mesh channel in BitChat</span>
+                        </label>
+                        <label class="check-item">
+                            <input type="checkbox">
+                            <span>Messages sent appear on MeshCore network</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="test-commands">
+                    <h3>Useful Test Commands</h3>
+                    
+                    <h4>In BitChat App:</h4>
+                    <div class="code-block">
+<pre><code>/j #mesh       # Join the bridged channel
+/w             # List online users
+/channels      # Show discovered channels
+Hello MeshCore!  # Send a test message</code></pre>
+                    </div>
+
+                    <h4>On MeshCore (via serial/app):</h4>
+                    <div class="code-block">
+<pre><code># Check peers
+peers
+
+# Send to #mesh
+msg #mesh Hello BitChat!</code></pre>
+                    </div>
+                </div>
+
+                <div class="troubleshooting">
+                    <h3>Troubleshooting</h3>
+                    
+                    <details>
+                        <summary>BitChat doesn't see the bridge device</summary>
+                        <ul>
+                            <li>Make sure Heltec V3 is powered on</li>
+                            <li>Check that you flashed the BitChat Bridge firmware (not regular companion)</li>
+                            <li>Unpair any existing MeshCore devices in Bluetooth settings</li>
+                            <li>Restart Bluetooth on your phone</li>
+                        </ul>
+                    </details>
+                    
+                    <details>
+                        <summary>Messages not reaching MeshCore network</summary>
+                        <ul>
+                            <li>Verify frequencies match on all devices</li>
+                            <li>Make sure you're in the #mesh channel</li>
+                            <li>Check that the SenseCAP repeater is online</li>
+                            <li>Try moving devices closer together for testing</li>
+                        </ul>
+                    </details>
+                    
+                    <details>
+                        <summary>Can't enter DFU mode on SenseCAP</summary>
+                        <ul>
+                            <li>Double-press RST button faster (within 500ms)</li>
+                            <li>Try a different USB cable</li>
+                            <li>Connect directly to computer (not through a hub)</li>
+                        </ul>
+                    </details>
+                    
+                    <details>
+                        <summary>Web flasher can't connect to Heltec V3</summary>
+                        <ul>
+                            <li>Use Chrome or Edge browser (WebSerial required)</li>
+                            <li>Make sure device is in bootloader mode (BOOT+RST)</li>
+                            <li>Try a different USB port</li>
+                            <li>Install CH340/CP210x drivers if needed</li>
+                        </ul>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resources Section -->
+        <section id="resources" class="section">
+            <div class="container">
+                <h2>Additional Resources</h2>
+                
+                <div class="resource-grid">
+                    <a href="https://github.com/jooray/MeshCore-BitChat" target="_blank" class="resource-card">
+                        <div class="resource-icon">&#x1F4BB;</div>
+                        <h3>MeshCore-BitChat Source</h3>
+                        <p>Bridge firmware source code and documentation</p>
+                    </a>
+                    
+                    <a href="https://github.com/permissionlesstech/bitchat-android" target="_blank" class="resource-card">
+                        <div class="resource-icon">&#x1F4F1;</div>
+                        <h3>BitChat Android Source</h3>
+                        <p>Open source BitChat app for Android</p>
+                    </a>
+                    
+                    <a href="https://github.com/meshcore-dev/MeshCore" target="_blank" class="resource-card">
+                        <div class="resource-icon">&#x1F4E1;</div>
+                        <h3>MeshCore Firmware</h3>
+                        <p>Official MeshCore firmware repository</p>
+                    </a>
+                    
+                    <a href="https://discord.gg/BMwCtwHj5V" target="_blank" class="resource-card">
+                        <div class="resource-icon">&#x1F4AC;</div>
+                        <h3>MeshCore Discord</h3>
+                        <p>Community support and discussion</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Built with care by the mesh community</p>
+            <p class="footer-links">
+                <a href="https://github.com/bitcoinveterans/meshcore-bitchat-setup" target="_blank">Source on GitHub</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
